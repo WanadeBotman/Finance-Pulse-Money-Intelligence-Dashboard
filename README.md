@@ -7,7 +7,7 @@ Finance Pulse is a sophisticated, client-side personal finance management tool d
 ## 🚀 Live Demo
 
 Check out the live application here:  
-**[👉 View Live Demo](https://wanadebotman.github.io/Finance-Pulse-Money-Intelligence-)**
+**[👉 View Live Demo](https://wanadebotman.github.io/Finance-Pulse-Money-Intelligence-Dashboard/)**
 
 ---
 
