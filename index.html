@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="description" content="Finance Pulse - Your Money Intelligence Dashboard for tracking income and expenses">
+  <meta name="theme-color" content="#0d6efd">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Finance Pulse • Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <div class="header-top">
+        <div>
+          <h1>Finance Pulse</h1>
+          <p>Your Money Intelligence Dashboard</p>
+        </div>
+        <button id="darkModeToggle" class="dark-mode-btn" title="Toggle dark mode">🌙</button>
+      </div>
+      <div class="header-controls">
+        <div class="month-navigation">
+          <button id="prevMonth" class="nav-btn">← Prev</button>
+          <span id="currentMonth" class="month-display">January 2026</span>
+          <button id="nextMonth" class="nav-btn">Next →</button>
+        </div>
+        <div class="export-buttons">
+          <button id="exportCSV" class="action-btn">📥 CSV</button>
+          <button id="exportPDF" class="action-btn">📄 PDF</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- ─── SEARCH & FILTER ─────────────────────────────────── -->
+    <section class="card filter-card">
+      <h2>Search & Filter</h2>
+      <div class="filter-controls">
+        <input type="text" id="searchInput" placeholder="Search by note or category...">
+        <select id="categoryFilter">
+          <option value="">All Categories</option>
+          <option value="Food">Food & Dining</option>
+          <option value="Transport">Transport</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Bills">Bills & Utilities</option>
+          <option value="Health">Health</option>
+          <option value="Income">Income (+)</option>
+          <option value="Other">Other</option>
+        </select>
+        <select id="typeFilter">
+          <option value="">All Types</option>
+          <option value="income">Income Only</option>
+          <option value="expense">Expenses Only</option>
+        </select>
+        <button id="clearFilters" class="action-btn">Clear Filters</button>
+      </div>
+    </section>
+
+    <!-- ─── INPUT FORM ─────────────────────────────────────── -->
+    <section class="card input-card">
+      <h2>Add Transaction</h2>
+      <form id="transactionForm">
+        <div class="form-row">
+          <input type="date" id="date" required>
+          <input type="number" id="amount" placeholder="Amount" step="0.01" min="0.01" required>
+        </div>
+        <div class="form-row">
+          <select id="category" required>
+            <option value="" disabled selected>Category</option>
+            <option value="Food">Food & Dining</option>
+            <option value="Transport">Transport</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Bills">Bills & Utilities</option>
+            <option value="Health">Health</option>
+            <option value="Income">Income (+)</option>
+            <option value="Other">Other</option>
+          </select>
+          <select id="type" required>
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <input type="text" id="note" placeholder="Note (optional)">
+          <label class="recurring-checkbox">
+            <input type="checkbox" id="isRecurring">
+            Recurring Monthly
+          </label>
+        </div>
+        <button type="submit">Add Transaction</button>
+      </form>
+    </section>
+
+    <!-- ─── OVERVIEW CARDS ─────────────────────────────────── -->
+    <section class="overview-grid">
+      <div class="card stat-card">
+        <h3>Balance</h3>
+        <div class="big-number" id="balance">R 0.00</div>
+      </div>
+      <div class="card stat-card">
+        <h3>Budget Health</h3>
+        <div class="big-number" id="healthScore">—</div>
+        <div id="healthLabel" class="small-label">No data</div>
+      </div>
+      <div class="card stat-card">
+        <h3>This Month Spending</h3>
+        <div class="big-number negative" id="monthSpending">R 0.00</div>
+      </div>
+      <div class="card stat-card">
+        <h3>Savings Rate</h3>
+        <div class="big-number" id="savingsRate">—</div>
+      </div>
+    </section>
+
+    <!-- ─── CHARTS ─────────────────────────────────────── -->
+    <section class="charts-grid">
+      <div class="card chart-card">
+        <h3>Spending by Category</h3>
+        <canvas id="pieChart"></canvas>
+      </div>
+      <div class="card chart-card">
+        <h3>Income vs Expenses</h3>
+        <canvas id="incomeExpenseChart"></canvas>
+      </div>
+    </section>
+
+    <!-- ─── TRENDS ─────────────────────────────────────── -->
+    <section class="card chart-card">
+      <h3>Monthly Spending Trend (Last 6 Months)</h3>
+      <canvas id="trendChart"></canvas>
+    </section>
+
+    <!-- ─── BUDGET PLANNING ─────────────────────────────── -->
+    <section class="card budget-card">
+      <h2>Budget Limits & Goals</h2>
+      <div class="budget-content">
+        <div class="budget-form">
+          <h3>Set Category Budget</h3>
+          <div class="form-row">
+            <select id="budgetCategory">
+              <option value="">Select Category</option>
+              <option value="Food">Food & Dining</option>
+              <option value="Transport">Transport</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills & Utilities</option>
+              <option value="Health">Health</option>
+              <option value="Other">Other</option>
+            </select>
+            <input type="number" id="budgetAmount" placeholder="Limit (R)" step="0.01" min="0">
+          </div>
+          <button id="setBudgetBtn" class="action-btn">Set Budget</button>
+        </div>
+        <div class="goal-form">
+          <h3>Savings Goal</h3>
+          <div class="form-row">
+            <input type="text" id="goalName" placeholder="Goal name (e.g., Emergency Fund)">
+            <input type="number" id="goalAmount" placeholder="Target amount (R)" step="0.01" min="0">
+          </div>
+          <button id="setGoalBtn" class="action-btn">Create Goal</button>
+        </div>
+      </div>
+      <div id="budgetsList" class="budgets-display"></div>
+      <div id="goalsList" class="goals-display"></div>
+    </section>
+
+    <!-- ─── ANALYTICS ─────────────────────────────────── -->
+    <section class="card analytics-card">
+      <h2>Detailed Analytics</h2>
+      <div id="analyticsGrid" class="analytics-grid"></div>
+    </section>
+
+    <!-- ─── CHARTS & LISTS ─────────────────────────────────── -->
+    <section class="dashboard-grid">
+
+      <div class="card chart-card">
+        <h3>Category Breakdown</h3>
+        <div class="bar-container" id="categoryBars"></div>
+      </div>
+
+      <div class="card">
+        <h3>Recent Transactions</h3>
+        <div id="recentList" class="transaction-list"></div>
+      </div>
+
+      <div class="card insights-card">
+        <h3>Monthly Insights</h3>
+        <ul id="insights"></ul>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ─── MODALS ─────────────────────────────────── -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2>Edit Transaction</h2>
+      <form id="editForm">
+        <div class="form-row">
+          <input type="date" id="editDate" required>
+          <input type="number" id="editAmount" placeholder="Amount" step="0.01" min="0.01" required>
+        </div>
+        <div class="form-row">
+          <select id="editCategory" required>
+            <option value="Food">Food & Dining</option>
+            <option value="Transport">Transport</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Bills">Bills & Utilities</option>
+            <option value="Health">Health</option>
+            <option value="Income">Income (+)</option>
+            <option value="Other">Other</option>
+          </select>
+          <select id="editType" required>
+            <option value="expense">Expense</option>
+            <option value="income">Income</option>
+          </select>
+        </div>
+        <input type="text" id="editNote" placeholder="Note (optional)">
+        <div class="form-buttons">
+          <button type="submit" class="action-btn">Save Changes</button>
+          <button type="button" id="deleteTransactionBtn" class="delete-btn">Delete Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="importModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2>Import Transactions</h2>
+      <p>Upload a CSV file with columns: date, amount, category, type, note</p>
+      <input type="file" id="importFile" accept=".csv" style="margin: 1rem 0;">
+      <button id="importBtn" class="action-btn">Import CSV</button>
+      <div id="importStatus"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Finance Pulse</h4>
+        <p>Your Money Intelligence Dashboard</p>
+      </div>
+      <div class="footer-section">
+        <h4>Features</h4>
+        <ul>
+          <li><a href="#transactions">Transactions</a></li>
+          <li><a href="#budgets">Budget Planning</a></li>
+          <li><a href="#analytics">Analytics</a></li>
+          <li><a href="#reports">Reports</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Data</h4>
+        <ul>
+          <li><a href="#" onclick="document.getElementById('exportCSV').click(); return false;">Export CSV</a></li>
+          <li><a href="#" onclick="document.getElementById('exportPDF').click(); return false;">Export PDF</a></li>
+          <li><a href="#" onclick="clearAllData(); return false;">Clear All Data</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Settings</h4>
+        <ul>
+          <li><a href="#" id="footerDarkMode">Dark Mode: OFF</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Support</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Finance Pulse. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+      <p>Built with @ <span><a href="https://github.com/WanadeBotman" target="_blank">sharkcxode</a></span></p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
