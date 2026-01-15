@@ -1,6 +1,7 @@
 # 💎 Finance Pulse: Money Intelligence Dashboard
 
-<img width="1902" height="887" alt="IT-Asset-Manager" src="https://github.com/user-attachments/assets/daa6370c-5025-4fa3-8a11-11a80168c53b" />
+<img width="1903" height="913" alt="Finance-Pulse" src="https://github.com/user-attachments/assets/a9c61dc9-9bf5-43f8-bd51-e574d9d8c91c" />
+
 
 Finance Pulse is a sophisticated, client-side personal finance management tool designed to provide deep insights into spending habits, budget health, and savings goals. Built with modern web technologies, it offers a responsive, "app-like" experience for tracking financial well-being directly in the browser.
 
